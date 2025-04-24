@@ -1,9 +1,6 @@
 import card_1 from "../assets/images/1.jpg";
 import card_2 from "../assets/images/2.jpg";
 
-import bg12 from "../assets/images/12.jpg";
-import bg2 from "../assets/images/bg2.jpg";
-
 // review img
 import reviewImg1 from "../assets/images/reviewimg/IMG_9016-_1_.webp";
 import reviewImg2 from "../assets/images/reviewimg/IMG_9017.webp";
@@ -578,11 +575,17 @@ export const gallery = [
     desc: "By Jonathon Willson",
   },
 ];
+///////////////////////////////////
+
+import chooseImg_1 from "../assets/images/chooseImages/whychooseusimage1.jpg";
+import chooseImg_2 from "../assets/images/chooseImages/whychooseusimage2.jpg";
+
+
 
 export const featuresData = [
   {
     title: "16 + Years of Experience",
-    image: bg12,
+    image: chooseImg_1,
     card_fit: "fit",
     cardContent: {
       description:
@@ -592,7 +595,7 @@ export const featuresData = [
   },
   {
     title: "Best Quality Photos",
-    image: bg2,
+    image: chooseImg_2,
     cardContent: {
       description:
         "We use cutting-edge equipment and techniques to deliver exceptional quality, ensuring your precious memories are captured with perfection and elegance.",

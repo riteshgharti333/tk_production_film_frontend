@@ -151,14 +151,17 @@ const Contact = () => {
     }
   };
 
+  const baseUrl =
+    import.meta.env.VITE_BASE_URL || "https://tkproductionfilm.com";
+  const fullUrl = `${baseUrl}${location.pathname}`;
+
   return (
     <div className="contact">
       <SEO
         title="Contact Us | TK Production Film - Get in Touch with Our Experts"
         description="Reach out to TK Production Film for professional photography and cinematography services. Contact us via phone, email, or visit our offices in London and India. Book your session today!"
         keywords="Contact TK Production Film, photography services contact, cinematography inquiries, London office contact, India branch contact, book photography session"
-        url="https://tkproductionfilm.com/contact-us"
-        author="TK Production Film"
+        url={fullUrl}
       />
 
       <h1 className="contact-title">Contact Us</h1>

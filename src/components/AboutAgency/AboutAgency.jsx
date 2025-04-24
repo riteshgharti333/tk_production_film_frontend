@@ -1,6 +1,6 @@
 import "./AboutAgency.scss";
 
-import bg7 from "../../assets/images/7.png";
+import home_about_img from "../../assets/images/home-about.jpeg";
 import { BsArrowUpRight } from "react-icons/bs";
 import { Link } from "react-router-dom";
 
@@ -26,7 +26,7 @@ const AboutAgency = () => {
 
       <div className="aboutAgency-bottom">
         <div className="aboutAgency-bottom-left">
-          <img src={bg7} alt="about image" loading="lazy" />
+          <img src={home_about_img} alt="about image" loading="lazy" />
 
           <Link to={"/about-us"}>
             <div className="aboutAgency-bottom-left-desc">

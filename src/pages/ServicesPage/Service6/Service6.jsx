@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import Loader from "../../../components/Loader/Loader";
 import SEO from "../../../SEO/SEO";
 import { serviceimages } from "../../../assets/data";
+import { useLocation } from "react-router-dom";
 
 const Service6 = () => {
   const contentRef = useRef(null);
@@ -65,14 +66,18 @@ const Service6 = () => {
     retry: 2, // Retry twice on failure
   });
 
+  const location = useLocation();
+  const baseUrl =
+    import.meta.env.VITE_BASE_URL || "https://tkproductionfilm.com";
+  const fullUrl = `${baseUrl}${location.pathname}`;
+
   return (
     <div className="service6">
       <SEO
         title="Engagement Photography & Couple Portraits | TK Production Film - Capture Your Love Story"
         description="Celebrate your love with stunning engagement photography and couple portraits by TK Production Film. Book your session today to create lasting memories!"
         keywords="engagement photography, couple portraits, pre-wedding photos, romantic photoshoot, TK Production Film"
-        url="https://tkproductionfilm.com/engagement-photography-couple-portraits"
-        author="TK Production Film"
+        url={fullUrl}
       />
 
       <div className="service6-top-banner">

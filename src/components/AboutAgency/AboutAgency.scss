@@ -202,6 +202,7 @@
         width: 150px;
         transition: all 0.5s cubic-bezier(0.645, 0.045, 0.355, 1);
         animation: icon-bounce 5s infinite linear;
+        margin-top: 10px;
 
         @media screen and (min-width: 1025px) {
           display: none;

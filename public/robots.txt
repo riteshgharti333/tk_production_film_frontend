@@ -1,38 +1,17 @@
-# ================================
-# Robots.txt for TK Production Film
-# ================================
-
-# ✅ Allow all search engines to crawl the site
 User-agent: *
-Disallow:
+Allow: /
 
-# ✅ Sitemap for better indexing
-Sitemap: https://tkproductionfilm.com/sitemap.xml
-
-# ✅ Block sensitive admin areas
-Disallow: /admin/
-Disallow: /login/
-Disallow: /register/
-Disallow: /user-profile/
-
-# ✅ Allow image, CSS, and JS crawling
-User-agent: Googlebot-Image
-Allow: /images/
-
-User-agent: Googlebot
-Allow: *.css
-Allow: *.js
-
-# ✅ Block specific bots (optional)
-User-agent: AhrefsBot
-Disallow: /
-
-User-agent: MJ12bot
-Disallow: /
-
-# ✅ Prevent duplicate content
-Disallow: /*?*
-Disallow: /*.php$
-
-
-Sitemap: https://tkproductionfilm.com/sitemap.xml
+Sitemap: https://www.tkproductionfilm.com/sitemap.xml
+Sitemap: https://www.tkproductionfilm.com/sitemaps/sitemap-homepage.xml
+Sitemap: https://www.tkproductionfilm.com/sitemaps/sitemap-about-us.xml
+Sitemap: https://www.tkproductionfilm.com/sitemaps/sitemap-contact.xml
+Sitemap: https://www.tkproductionfilm.com/sitemaps/sitemap-portfolio.xml
+Sitemap: https://www.tkproductionfilm.com/sitemaps/sitemap-wedding-photography.xml
+Sitemap: https://www.tkproductionfilm.com/sitemaps/sitemap-wedding-cinematography.xml
+Sitemap: https://www.tkproductionfilm.com/sitemaps/sitemap-pre-wedding-film.xml
+Sitemap: https://www.tkproductionfilm.com/sitemaps/sitemap-pre-wedding-photography.xml
+Sitemap: https://www.tkproductionfilm.com/sitemaps/sitemap-civil-marriage-photography.xml
+Sitemap: https://www.tkproductionfilm.com/sitemaps/sitemap-engagement-photography-couple-portraits.xml
+Sitemap: https://www.tkproductionfilm.com/sitemaps/sitemap-birthday-photography.xml
+Sitemap: https://www.tkproductionfilm.com/sitemaps/sitemap-baby-shower-photography.xml
+Sitemap: https://www.tkproductionfilm.com/sitemaps/sitemap-graduation-photography.xml

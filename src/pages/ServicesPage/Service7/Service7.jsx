@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import Loader from "../../../components/Loader/Loader";
 import SEO from "../../../SEO/SEO";
 import { serviceimages } from "../../../assets/data";
+import { useLocation } from "react-router-dom";
 
 const Service7 = () => {
   const contentRef = useRef(null);
@@ -71,14 +72,18 @@ const Service7 = () => {
     retry: 2, // Retry twice on failure
   });
 
+  const location = useLocation();
+  const baseUrl =
+    import.meta.env.VITE_BASE_URL || "https://tkproductionfilm.com";
+  const fullUrl = `${baseUrl}${location.pathname}`;
+
   return (
     <div className="service7">
       <SEO
         title="Birthday Photography | TK Production Film - Capture Your Special Moments"
         description="Celebrate your special day with professional birthday photography by TK Production Film. Book your session today and make your memories unforgettable!"
         keywords="birthday photography, event photography, birthday party photos, birthday memories, TK Production Film"
-        url="https://tkproductionfilm.com/birthday-photography"
-        author="TK Production Film"
+        url={fullUrl}
       />
 
       <div className="service7-top-banner">

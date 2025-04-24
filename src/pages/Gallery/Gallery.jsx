@@ -50,11 +50,14 @@ const Gallery = () => {
 
   const currentCards = data ? data.slice(offset, offset + cardsPerPage) : [];
 
-  // ✅ Handle Page Change
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
     window.scrollTo(0, 0);
   };
+
+  const baseUrl =
+    import.meta.env.VITE_BASE_URL || "https://tkproductionfilm.com";
+  const fullUrl = `${baseUrl}${location.pathname}`;
 
   return (
     <div className="gallery">
@@ -62,8 +65,7 @@ const Gallery = () => {
         title="Gallery | TK Production Film - Best Photography & Cinematography"
         description="Explore the stunning gallery of TK Production Film showcasing top-quality images from weddings, pre-weddings, engagements, baby showers, birthdays, and more. Book your service today!"
         keywords="photography gallery, wedding images, pre-wedding photos, engagement portraits, baby shower pictures, birthday event gallery, TK Production Film gallery"
-        url={`https://tkproductionfilm.com${location.pathname}`}
-        author="TK Production Film"
+        url={fullUrl}
       />
 
       <div className="gallery-top-banner">

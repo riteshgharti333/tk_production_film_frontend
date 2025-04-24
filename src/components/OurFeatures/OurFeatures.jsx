@@ -24,7 +24,6 @@ const OurFeatures = () => {
 
   return (
     <div className="ourFeatures">
-      {/* Mobile View */}
       <div className="ourFeatures-mobile">
         <h1 className="ourFeatures-mobile-title">Why choose Us</h1>
         <div className="ourFeatures-mobile-cards">

@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
 import "./ClientReview.scss";
+
+import React, { useState, useRef, useEffect } from "react";
 
 import { FaStar } from "react-icons/fa";
 import { RiDoubleQuotesR } from "react-icons/ri";
@@ -11,7 +12,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 
-import bg2 from "../../assets/images/bg2.jpg";
+import reviewBgImg from "../../assets/images/reviewbgimg.jpeg";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { baseUrl } from "../../main";
@@ -73,7 +74,7 @@ const ClientReview = () => {
   return (
     <div className="clientReview">
       <div className="clientReview-img">
-        <img src={bg2} alt="Client Background" loading="lazy" />
+        <img src={reviewBgImg} alt="Client Background" loading="lazy" />
 
         <div className="clientReview-card">
           <Swiper
@@ -90,7 +91,6 @@ const ClientReview = () => {
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
           >
             {isLoading ? (
-              // ✅ Loader inside the Swiper slide
               <SwiperSlide className="swiper-slide-loader">
                 <Loader loaderSize="clientLoader" />
               </SwiperSlide>

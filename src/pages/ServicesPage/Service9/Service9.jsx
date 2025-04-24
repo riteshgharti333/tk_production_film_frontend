@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import Loader from "../../../components/Loader/Loader";
 import SEO from "../../../SEO/SEO";
 import { serviceimages } from "../../../assets/data";
+import { useLocation } from "react-router-dom";
 
 const Service9 = () => {
   const contentRef = useRef(null);
@@ -65,14 +66,18 @@ const Service9 = () => {
     retry: 2, // Retry twice on failure
   });
 
+  const location = useLocation();
+  const baseUrl =
+    import.meta.env.VITE_BASE_URL || "https://tkproductionfilm.com";
+  const fullUrl = `${baseUrl}${location.pathname}`;
+
   return (
     <div className="service9">
       <SEO
         title="Graduation Photography | TK Production Film - Capture Your Achievement"
         description="Celebrate your academic success with professional graduation photography by TK Production Film. Book your session today and preserve this proud milestone forever!"
         keywords="graduation photography, academic achievement photos, graduation portraits, professional graduation images, TK Production Film"
-        url="https://tkproductionfilm.com/graduation-photography"
-        author="TK Production Film"
+        url={fullUrl}
       />
 
       <div className="service9-top-banner">

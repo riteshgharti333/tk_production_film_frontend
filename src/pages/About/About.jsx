@@ -26,6 +26,7 @@ import { aboutLists } from "../../assets/data";
 import founder_img from "../../assets/images/teamImgs/founder.jpeg";
 import Video from "../../components/Video/Video";
 import SEO from "../../SEO/SEO";
+import { useLocation } from "react-router-dom";
 
 const About = () => {
   const [openIndex, setOpenIndex] = useState(0);
@@ -66,14 +67,18 @@ const About = () => {
     });
   }, []);
 
+  const location = useLocation();
+  const baseUrl =
+    import.meta.env.VITE_BASE_URL || "https://tkproductionfilm.com";
+  const fullUrl = `${baseUrl}${location.pathname}`;
+
   return (
     <div className="about">
       <SEO
         title="About Us | TK Production Film - Capturing Your Precious Moments"
         description="Discover TK Production Film – a creative team specializing in professional wedding photography, pre-wedding films, engagement portraits, and more. Our mission is to capture your unforgettable memories with passion and precision."
         keywords="About TK Production Film, professional photography, cinematography services, wedding photography team, creative filmmakers, expert photographers, TK Production Film team"
-        url="https://tkproductionfilm.com/about-us"
-        author="TK Production Film"
+        url={fullUrl}
       />
 
       <div className="top-banner">

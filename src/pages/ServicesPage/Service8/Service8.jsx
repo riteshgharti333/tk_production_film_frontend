@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import Loader from "../../../components/Loader/Loader";
 import SEO from "../../../SEO/SEO";
 import { serviceimages } from "../../../assets/data";
+import { useLocation } from "react-router-dom";
 
 const Service8 = () => {
   const contentRef = useRef(null);
@@ -65,14 +66,18 @@ const Service8 = () => {
     retry: 2, // Retry twice on failure
   });
 
+  const location = useLocation();
+  const baseUrl =
+    import.meta.env.VITE_BASE_URL || "https://tkproductionfilm.com";
+  const fullUrl = `${baseUrl}${location.pathname}`;
+
   return (
     <div className="service8">
       <SEO
         title="Baby Shower Photography | TK Production Film - Cherish Precious Moments"
         description="Capture the joy and beauty of your baby shower with professional photography by TK Production Film. Book your session today and create timeless memories!"
         keywords="baby shower photography, maternity event photos, baby celebration pictures, professional baby shower images, TK Production Film"
-        url="https://tkproductionfilm.com/baby-shower-photography"
-        author="TK Production Film"
+        url={fullUrl}
       />
 
       <div className="service8-top-banner">

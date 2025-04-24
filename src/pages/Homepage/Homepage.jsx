@@ -16,6 +16,7 @@ import PhotoAlbums from "../../components/PhotoAlbums/PhotoAlbums";
 import { baseUrl } from "../../main";
 import SEO from "../../SEO/SEO";
 import WeddingType from "../../components/WeddingType/WeddingType";
+import { useLocation } from "react-router-dom";
 
 const Homepage = () => {
   useEffect(() => {
@@ -30,21 +31,24 @@ const Homepage = () => {
     trackVisitor();
   }, []);
 
+  const location = useLocation();
+  const baseUrl =
+    import.meta.env.VITE_BASE_URL || "https://tkproductionfilm.com";
+  const fullUrl = `${baseUrl}${location.pathname}`;
+
   return (
     <div className="homepage">
       <SEO
         title="TK Production Film | Best Photography & Cinematography Services"
         description="Capture your special moments with TK Production Film – expert wedding, pre-wedding, engagement, and event photography. Book your service today!"
         keywords="photography, cinematography, wedding photography, pre-wedding film, baby shower photography, birthday photography, civil marriage photos, engagement portraits, TK Production Film"
-        url="https://tkproductionfilm.com"
-        author="TK Production Film"
+        url={fullUrl}
       />
       <HomeBanner />
       <div className="homepage-container">
         <OurService />
         <PhotoAlbums />
         <AboutAgency />
-        <WeddingType />
         <OurFeatures />
         <OurCore />
         <OurPorfolio />

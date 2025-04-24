@@ -17,6 +17,7 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import SEO from "../../../SEO/SEO";
+import { useLocation } from "react-router-dom";
 
 const Service2 = () => {
   const contentRef = useRef(null);
@@ -61,14 +62,18 @@ const Service2 = () => {
     fetchData();
   }, []);
 
+  const location = useLocation();
+  const baseUrl =
+    import.meta.env.VITE_BASE_URL || "https://tkproductionfilm.com";
+  const fullUrl = `${baseUrl}${location.pathname}`;
+
   return (
     <div className="service2">
       <SEO
         title="Wedding Cinematography | TK Production Film - Capture Your Love Story in Motion"
         description="Relive your wedding day with TK Production Film's cinematic wedding cinematography. We create stunning, high-quality wedding films that capture every emotion. Book now!"
         keywords="wedding cinematography, cinematic wedding films, professional wedding videography, TK Production Film, wedding day videos, cinematic love stories"
-        url="https://tkproductionfilm.com/wedding-cinematography"
-        author="TK Production Film"
+        url={fullUrl}
       />
 
       <div className="service2-top-banner">

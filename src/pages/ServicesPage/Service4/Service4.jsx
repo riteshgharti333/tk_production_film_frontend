@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import Loader from "../../../components/Loader/Loader";
 import SEO from "../../../SEO/SEO";
 import { serviceimages } from "../../../assets/data";
+import { useLocation } from "react-router-dom";
 
 const Service4 = () => {
   const contentRef = useRef(null);
@@ -66,14 +67,18 @@ const Service4 = () => {
     retry: 2, // Retry twice on failure
   });
 
+  const location = useLocation();
+  const baseUrl =
+    import.meta.env.VITE_BASE_URL || "https://tkproductionfilm.com";
+  const fullUrl = `${baseUrl}${location.pathname}`;
+
   return (
     <div className="service4">
       <SEO
         title="Pre-Wedding Photography | TK Production Film - Capture Romantic Moments Before Your Big Day"
         description="Cherish your love story with TK Production Film's pre-wedding photography. Stunning, romantic, and creative photos to treasure forever. Book your session now!"
         keywords="pre-wedding photography, couple photoshoot, romantic pre-wedding, creative pre-wedding pictures, TK Production Film, couple portraits"
-        url="https://tkproductionfilm.com/pre-wedding-photography"
-        author="TK Production Film"
+        url={fullUrl}
       />
 
       <div className="service4-top-banner">

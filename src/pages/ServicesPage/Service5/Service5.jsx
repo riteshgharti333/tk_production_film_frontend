@@ -16,12 +16,11 @@ import toast from "react-hot-toast";
 import Loader from "../../../components/Loader/Loader";
 import SEO from "../../../SEO/SEO";
 import { serviceimages } from "../../../assets/data";
+import { useLocation } from "react-router-dom";
 
 const Service5 = () => {
   const contentRef = useRef(null);
   const [selectedImg, setSelectedImg] = useState(null);
-
- 
 
   const fetchServiceImages = async () => {
     try {
@@ -67,16 +66,19 @@ const Service5 = () => {
     retry: 2, // Retry twice on failure
   });
 
+  const location = useLocation();
+  const baseUrl =
+    import.meta.env.VITE_BASE_URL || "https://tkproductionfilm.com";
+  const fullUrl = `${baseUrl}${location.pathname}`;
+
   return (
     <div className="service5">
       <SEO
         title="Civil Marriage Photography | TK Production Film - Capture Your Special Day with Elegance"
         description="Preserve the memories of your civil marriage with TK Production Film. Expert photography capturing every emotion and detail. Book your session today!"
         keywords="civil marriage photography, wedding photography, marriage portraits, TK Production Film, elegant civil wedding photos"
-        url="https://tkproductionfilm.com/civil-marriage-photography"
-        author="TK Production Film"
+        url={fullUrl}
       />
-
       <div className="service5-top-banner">
         <div className="service5-banner">
           <div className="service5-banner-desc">
@@ -84,7 +86,6 @@ const Service5 = () => {
           </div>
         </div>
       </div>
-
       <div className="service5-container">
         <div className="service5-container-content" ref={contentRef}>
           <div className="service5-container-content-top">
@@ -179,7 +180,6 @@ const Service5 = () => {
           </div>
         </div>
       </div>
-
       {selectedImg && (
         <div className="image-modal" onClick={() => setSelectedImg(null)}>
           <img src={selectedImg} alt="Fullscreen Preview" loading="lazy" />
@@ -187,8 +187,8 @@ const Service5 = () => {
             ×
           </span>
         </div>
-      )}æ
-
+      )}
+      æ
       <div className="service-contact">
         <ServiceContact />
       </div>
