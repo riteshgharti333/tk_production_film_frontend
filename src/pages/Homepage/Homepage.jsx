@@ -17,6 +17,7 @@ import { baseUrl } from "../../main";
 import SEO from "../../SEO/SEO";
 import WeddingType from "../../components/WeddingType/WeddingType";
 import { useLocation } from "react-router-dom";
+import HomeVideo from "../../components/HomeVideo/HomeVideo";
 
 const Homepage = () => {
   useEffect(() => {
@@ -48,6 +49,7 @@ const Homepage = () => {
       <div className="homepage-container">
         <OurService />
         <PhotoAlbums />
+        <HomeVideo />
         <AboutAgency />
         <OurFeatures />
         <OurCore />

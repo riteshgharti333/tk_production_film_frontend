@@ -11,51 +11,51 @@ import axios from "axios";
 import { baseUrl } from "../../main";
 import Loader from "../../components/Loader/Loader";
 
+const fetchBanner = async () => {
+  if (!navigator.onLine) {
+    throw new Error("NETWORK_ERROR");
+  }
+
+  const { data } = await axios.get(`${baseUrl}/photoAlbum/all-photo-album`);
+  return data?.photoAlbum;
+};
+
 const PhotoAlbums = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // ✅ Fetch albums with proper error handling
-  const fetchPhotoAlbums = async () => {
-    try {
-      const { data } = await axios.get(`${baseUrl}/photoAlbum/all-photo-album`);
-      return data.photoAlbum;
-    } catch (error) {
-      if (error.response) {
-        console.error("Server Error:", error.response);
-        throw new Error(
-          error.response.status >= 500
-            ? "Server error! Please try again later."
-            : "Failed to load photo albums!"
-        );
-      } else if (error.request) {
-        console.error("Network Error:", error.request);
-        throw new Error("Network error! Check your internet connection.");
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["photo-album"],
+    queryFn: fetchBanner,
+    staleTime: 1000 * 60 * 5,
+    retry: false,
+  });
+
+  if (isError) {
+    console.log("🔴 Error Object:", error);
+    if (error.name === "AxiosError") {
+      const isNetworkError =
+        !error.response ||
+        error.message.includes("ECONNRESET") ||
+        error.response?.data?.message === "read ECONNRESET";
+
+      if (isNetworkError) {
+        setTimeout(() => {
+          toast.error("🚫 Network error. Please check your connection.");
+        }, 100);
       } else {
-        console.error("Unknown Error:", error.message);
-        throw new Error("Unexpected error occurred!");
+        console.error("❗ Server Error:", error.response?.status);
       }
     }
-  };
-
-  // ✅ Use React Query for better data management
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["photoAlbums"],
-    queryFn: fetchPhotoAlbums,
-    staleTime: 1000 * 60 * 5,
-    retry: 2,
-  });
+  }
 
   return (
     <div className="photoAlbums">
-      {/* ✅ Title and description always visible */}
       <h1>Photo Albums</h1>
       <p className="photoAlbums-desc">
         Collection of photos - All of Our Best Works
       </p>
-
-      {/* ✅ Show Loader below title and description */}
       {isLoading ? (
-        <Loader loaderSize="photoAlbumLoader"/>
+        <Loader loaderSize="photoAlbumLoader" />
       ) : isError ? (
         <div className="error-container">
           <div className="error-container-desc">
@@ -74,6 +74,10 @@ const PhotoAlbums = () => {
             autoplay={{ delay: 3000, disableOnInteraction: false }}
             modules={[Autoplay, Navigation]}
             className="photoAlbums-slider album-swiper"
+            navigation={{
+              nextEl: ".pa-swiper-next",
+              prevEl: ".pa-swiper-prev",
+            }}
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
             breakpoints={{
               0: {
@@ -106,11 +110,16 @@ const PhotoAlbums = () => {
                     />
                   </div>
                 </SwiperSlide>
+
+                
               ))
             ) : (
               <p>No photo albums available</p>
             )}
           </Swiper>
+
+          <div className="pa-swiper-prev">❮</div>
+        <div className="pa-swiper-next">❯</div>
         </div>
       )}
     </div>

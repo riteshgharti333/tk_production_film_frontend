@@ -117,92 +117,46 @@
   }
 }
 
-// /* Active slide's content description */
-// .photoAlbums .swiper-slide-active .photoAlbums-card-content-desc {
-//   opacity: 1 !important;
-//   transform: translateY(0) !important;
-// }
-
-// /* Swiper slide transformations */
-// .photoAlbums .swiper-slide {
-//   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-//   transform: scale(0.85);
-// }
-
-// .photoAlbums .swiper-slide-active {
-//   transform: scale(1);
-//   z-index: 10;
-//   position: relative;
-// }
-
-// /* Adjust prev/next slide transformations */
-// .photoAlbums .swiper-slide-next,
-// .photoAlbums .swiper-slide-prev {
-//   transform: scale(0.85) !important;
-// }
-
-/* Adjust slide container to allow shadow to overflow */
-// .photoAlbums-cards {
-//   position: relative;
-//   max-width: 100%;
-//   overflow: visible !important;
-// }
-
-// /* Image styling */
-// .photoAlbums-card-content img {
-//   width: 100%;
-//   height: auto;
-//   transition: transform 0.3s ease;
-// }
-
-/* Navigation buttons */
-.swiper-button-prev,
-.swiper-button-next {
-  position: absolute;
-  font-size: 20px;
-  font-weight: bold;
-  color: white;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 10px;
-  z-index: 1000;
-  text-transform: uppercase;
-  font-size: 13px;
-  font-family: 500;
-}
-
-.swiper-button-prev {
-  left: 20%;
-
-  @include lg {
-    left: 0;
-  }
-}
-
-.swiper-button-next {
-  right: 20%;
-
-  @include lg {
-    right: 0;
-  }
-}
-
-.album-swiper {
-  .swiper-wrapper {
-    // padding-top: 50px;
-    // padding-bottom: 80px;
-
-    @include sm {
-      // padding-top: 20px;
-      // padding-bottom: 20px;
-    }
-  }
-}
-
-/* Ensure proper scaling for swiper slides */
 .swiper-slide {
   overflow: visible !important;
   display: flex;
   justify-content: center;
+}
+
+.pa-swiper-prev,
+.pa-swiper-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $primary-color;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 100;
+  font-size: 20px;
+  transition: background 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  padding: 5px 14px;
+
+  &:active {
+    transform: translateY(-50%) scale(0.95);
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.pa-swiper-prev {
+  left: 10px;
+}
+
+.pa-swiper-next {
+  right: 10px;
+}
+
+.pa-swiper-prev:hover,
+.pa-swiper-next:hover {
+  background: $primary-color;
+  color: #fff;
 }

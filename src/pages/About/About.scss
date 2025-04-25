@@ -182,7 +182,7 @@
   .about-content {
     display: flex;
     gap: 60px;
-    max-width: 1500px;
+    max-width: 1200px;
     margin: 0 auto;
     z-index: 10;
     padding: 0px 30px;
@@ -210,6 +210,7 @@
       .about-content-left-top {
         display: flex;
         gap: 60px;
+        align-items: center;
 
         @include xl {
           gap: 15px;
@@ -220,7 +221,8 @@
         }
 
         @include md {
-          flex-direction: column;
+          flex-direction: column-reverse;
+          gap: 40px;
         }
 
         .about-content-left-top-desc {
@@ -280,10 +282,11 @@
       .about-content-left-bottom {
         display: flex;
         gap: 60px;
+        margin-top: 30px;
 
         @include lg {
           flex-direction: column;
-          gap: 10px;
+          gap: 30px;
           margin-top: 30px;
         }
         .about-content-left-content {
@@ -296,25 +299,28 @@
 
               @include lg {
                 font-size: 50px;
+                flex: 2;
               }
 
               @include sm {
-                font-size: 45px;
+                font-size: 30px;
               }
             }
 
             p {
-              font-size: 20px;
+              font-size: 18px;
               margin-left: 10px;
               color: #585858;
+              font-weight: 600;
               text-transform: uppercase;
 
               @include lg {
                 font-size: 22px;
+                flex: 8;
               }
 
               @include sm {
-                font-size: 16px;
+                font-size: 14px;
               }
             }
           }
@@ -330,16 +336,6 @@
       }
     }
 
-    .about-content-right {
-      flex: 3;
-      @include lg {
-        display: none;
-        flex: 0;
-      }
-      img {
-        width: 100%;
-      }
-    }
   }
   .about-content2 {
     position: relative;

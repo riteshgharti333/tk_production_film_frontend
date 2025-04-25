@@ -1,4 +1,5 @@
-import "./Service4.scss";
+import "../Service.scss";
+
 import { FaCheck } from "react-icons/fa";
 import ServiceContact from "../../../components/ServiceContact/ServiceContact";
 import { service2Data, service2Steps } from "../../../assets/servicesData";
@@ -18,54 +19,46 @@ import SEO from "../../../SEO/SEO";
 import { serviceimages } from "../../../assets/data";
 import { useLocation } from "react-router-dom";
 
+const fetchService = async () => {
+  if (!navigator.onLine) {
+    throw new Error("NETWORK_ERROR");
+  }
+
+  const { data } = await axios.get(
+    `${baseUrl}/services/pre-wedding-photography/67de710faa6520fad7a0666d`
+  );
+  return data?.serviceImages?.images;
+};
+
 const Service4 = () => {
   const contentRef = useRef(null);
 
   const [selectedImg, setSelectedImg] = useState(null);
 
-  const fetchServiceImages = async () => {
-    try {
-      const { data } = await axios.get(
-        `${baseUrl}/services/pre-wedding-photography/67de710faa6520fad7a0666d`
-      );
-
-      if (!data || !data.serviceImages?.images?.length) {
-        toast.error("No images found.");
-        return [];
-      }
-
-      return data.serviceImages.images;
-    } catch (error) {
-      console.error("Error fetching service images:", error);
-
-      if (error.message === "Network Error") {
-        toast.error("Network error! Check your internet connection.");
-      } else if (error.response) {
-        toast.error(
-          error.response.status >= 500
-            ? "Server error! Please try again later."
-            : "Failed to load images!"
-        );
-      } else {
-        toast.error("Unexpected error occurred!");
-      }
-
-      return [];
-    }
-  };
-
-  const {
-    data: serviceImages,
-    isLoading: imagesLoading,
-    isError: imagesError,
-    error: imgError,
-    refetch: refetchImages,
-  } = useQuery({
-    queryKey: ["serviceImages4"],
-    queryFn: fetchServiceImages,
-    staleTime: 1000 * 60 * 5, // Cache for 5 mins
-    retry: 2, // Retry twice on failure
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["service-4"],
+    queryFn: fetchService,
+    staleTime: 1000 * 60 * 5,
+    retry: false,
   });
+
+  if (isError) {
+    console.log("🔴 Error Object:", error);
+    if (error.name === "AxiosError") {
+      const isNetworkError =
+        !error.response ||
+        error.message.includes("ECONNRESET") ||
+        error.response?.data?.message === "read ECONNRESET";
+
+      if (isNetworkError) {
+        setTimeout(() => {
+          toast.error("🚫 Network error. Please check your connection.");
+        }, 100);
+      } else {
+        console.error("❗ Server Error:", error.response?.status);
+      }
+    }
+  }
 
   const location = useLocation();
   const baseUrl =
@@ -73,7 +66,7 @@ const Service4 = () => {
   const fullUrl = `${baseUrl}${location.pathname}`;
 
   return (
-    <div className="service4">
+    <div className="service">
       <SEO
         title="Pre-Wedding Photography | TK Production Film - Capture Romantic Moments Before Your Big Day"
         description="Cherish your love story with TK Production Film's pre-wedding photography. Stunning, romantic, and creative photos to treasure forever. Book your session now!"
@@ -81,33 +74,33 @@ const Service4 = () => {
         url={fullUrl}
       />
 
-      <div className="service4-top-banner">
-        <div className="service4-banner">
-          <div className="service4-banner-desc">
+      <div className="service-top-banner">
+        <div className="service-banner">
+          <div className="service-banner-desc">
             <h1>Pre-Wedding Photography</h1>
           </div>
         </div>
       </div>
 
-      <div className="service4-container">
-        <div className="service4-container-content" ref={contentRef}>
-          <div className="service4-container-content-top">
-            {imagesLoading && (
-              <div className="service4-loader-container">
+      <div className="service-container">
+        <div className="service-container-content" ref={contentRef}>
+          <div className="service-container-content-top">
+            {isLoading && (
+              <div className="service-loader-container">
                 <Loader loaderSize="serviceLoader" />
               </div>
             )}
 
-            {imagesError && (
-              <div className="service4-error-container">
-                <div className="service4-error-desc">
-                  <p>{imgError.message}</p>
-                  <button onClick={refetchImages}>Retry</button>
+            {isError && (
+              <div className="service-error-container">
+                <div className="service-error-desc">
+                  <p>{error.message}</p>
+                  <button onClick={refetch}>Retry</button>
                 </div>
               </div>
             )}
 
-            {serviceImages && serviceImages.length > 0 ? (
+            {data && data?.length > 0 ? (
               <div className="services-img-slide">
                 <Swiper
                   modules={[EffectFade, Autoplay]}
@@ -117,7 +110,7 @@ const Service4 = () => {
                   autoplay={{ delay: 3000, disableOnInteraction: false }}
                   className="services-slide"
                 >
-                  {serviceImages.map((item, index) => (
+                  {data?.map((item, index) => (
                     <SwiperSlide key={index} className="service_slide">
                       <img src={item} loading="lazy" alt="services" />
                     </SwiperSlide>
@@ -125,8 +118,25 @@ const Service4 = () => {
                 </Swiper>
               </div>
             ) : (
-              !imagesLoading && <p>No images available</p>
+              !isLoading && <p>No images available</p>
             )}
+
+            <div className="service-images">
+              <h2>Our Pre-Wedding Photography Gallery</h2>
+              <hr />
+              <div className="service-image-cards">
+                {serviceimages.map((item, index) => (
+                  <div className="service-image-card" key={index}>
+                    <img
+                      src={item.img}
+                      alt="service image"
+                      loading="lazy"
+                      onClick={() => setSelectedImg(item.img)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
 
             <h1>Pre-Wedding Photography by TK Production Film</h1>
             <p>
@@ -139,51 +149,41 @@ const Service4 = () => {
             </p>
           </div>
 
-          <div className="service4-services">
-            <h1>What We Offer</h1>
-            <ul>
-              {service2Data.map((item) => (
-                <li key={item.title}>
-                  <FaCheck className="check-icon" />
-                  <div className="services-desc">
-                    <p>{item.title}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <div className="service-steps-container">
+            <div className="service-services">
+              <h1>What We Offer</h1>
+              <ul>
+                {service2Data.map((item) => (
+                  <li key={item.title}>
+                    <FaCheck className="check-icon" />
+                    <div className="services-desc">
+                      <p>{item.title}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <div className="service4-steps">
-            <h1>How It Works?</h1>
-            <ul>
-              {service2Steps.map((item) => (
-                <li key={item.no}>
-                  <p>{item.no}</p>
-                  <p>
-                    <span>{item.title}</span>
-                  </p>
-                </li>
-              ))}
-            </ul>
-            <p>Let’s make your pre-wedding moments magical!</p>
-          </div>
-
-          <hr />
-          <div className="service-images">
-            <h2>Our Pre-Wedding Photography Gallery</h2>
-            <div className="service-image-cards">
-              {serviceimages.map((item, index) => (
-                <div className="service-image-card" key={index}>
-                  <img
-                    src={item.img}
-                    alt="service image"
-                    loading="lazy"
-                    onClick={() => setSelectedImg(item.img)}
-                  />
-                </div>
-              ))}
+            <div className="service-steps">
+              <h1>How It Works?</h1>
+              <ul>
+                {service2Steps.map((item) => (
+                  <li key={item.no}>
+                    <p>{item.no}</p>
+                    <p>
+                      <span>{item.title}</span>
+                    </p>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
+
+          <p className="bottom-desc">
+            Let’s make your pre-wedding moments magical!
+          </p>
+
+          <hr />
         </div>
       </div>
 

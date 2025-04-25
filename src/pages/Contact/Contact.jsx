@@ -13,55 +13,36 @@ import SEO from "../../SEO/SEO";
 const Contact = () => {
   const [openSelect, setOpenSelect] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
-
-  const [isValid, setIsValid] = useState(true);
-  const selectRef = useRef(null);
-  const weddingRef = useRef(null);
   const [weddingOption, setWeddingOption] = useState("");
-
   const [weddingType, setWedingType] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isValid, setIsValid] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    location: "",
+    eventDate: "",
+    servicesNeeded: [],
+    weddingType: "",
+    howDidYouHear: "",
+    message: "",
+  });
 
   const location = useLocation();
+  const selectRef = useRef(null);
+  const weddingRef = useRef(null);
 
+  // Scroll to map if hash is present
   useEffect(() => {
     if (location.hash === "#map") {
       document.getElementById("map")?.scrollIntoView({ behavior: "smooth" });
     }
   }, [location]);
 
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    country: "",
-    eventDetail: {
-      date: "",
-      time: "",
-      venueAddress: "",
-      numberOfGuests: "",
-      additionalRequirements: "",
-    },
-  });
-
-  const handleOpenSelect = () => {
-    setOpenSelect((prev) => !prev);
-  };
-
-  const handleSelectOption = (option) => {
-    setSelectedOption(option);
-    setIsValid(true);
-    setOpenSelect(false);
-  };
-
-  const handleWeddngSelection = (option) => {
-    setWeddingOption(option);
-    setIsValid(true), setWedingType(false);
-  };
-
+  // Close select dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (selectRef.current && !selectRef.current.contains(event.target)) {
@@ -75,52 +56,76 @@ const Contact = () => {
     };
   }, []);
 
+  const handleOpenSelect = () => {
+    setOpenSelect((prev) => !prev);
+  };
+
+  const handleSelectOption = (option) => {
+    setSelectedOption(option);
+    setIsValid(true);
+    setOpenSelect(false);
+  };
+
+  const handleWeddingSelection = (option) => {
+    setWeddingOption(option);
+    setIsValid(true);
+    setWedingType(false);
+  };
+
+  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
-    if (
-      [
-        "date",
-        "time",
-        "venueAddress",
-        "numberOfGuests",
-        "additionalRequirements",
-      ].includes(name)
-    ) {
-      setFormData((prev) => ({
-        ...prev,
-        eventDetail: {
-          ...prev.eventDetail,
-          [name]: value,
-        },
+  const handleCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+    
+    if (checked) {
+      // Add the selected service to the array
+      setFormData((prevData) => ({
+        ...prevData,
+        servicesNeeded: [...prevData.servicesNeeded, value],
       }));
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
+      // Remove the unselected service from the array
+      setFormData((prevData) => ({
+        ...prevData,
+        servicesNeeded: prevData.servicesNeeded.filter(service => service !== value),
       }));
     }
   };
+  
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedOption) {
+    if (!selectedOption || !weddingOption) {
       setIsValid(false);
+      setErrorMessage(
+        "Please select both wedding type and how you heard about us."
+      );
       return;
     }
-    if (!weddingOption) {
+
+    if (formData.servicesNeeded.length === 0) {
       setIsValid(false);
+      setErrorMessage("Please select at least one service.");
       return;
     }
 
     setLoading(true);
+    setErrorMessage("");
 
     try {
       const response = await axios.post(`${baseUrl}/contact2/new-contact2`, {
         ...formData,
-        howDidYouHearAboutUs: selectedOption,
+        howDidYouHear: selectedOption,
+        weddingType: weddingOption,
       });
 
       if (response.data.success) {
@@ -130,22 +135,21 @@ const Contact = () => {
           lastName: "",
           email: "",
           phoneNumber: "",
-          country: "",
-          eventDetail: {
-            date: "",
-            time: "",
-            venueAddress: "",
-            numberOfGuests: "",
-            additionalRequirements: "",
-          },
+          location: "",
+          eventDate: "",
+          servicesNeeded: [],
+          weddingType: "",
+          howDidYouHear: "",
+          message: "",
         });
         setSelectedOption("");
+        setWeddingOption("");
       } else {
         toast.error(response.data.message || "Submission failed!");
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error("An error occurred while submitting the form.");
+      toast.error(error.response?.data?.message || "An error occurred.");
     } finally {
       setLoading(false);
     }
@@ -165,221 +169,238 @@ const Contact = () => {
       />
 
       <h1 className="contact-title">Contact Us</h1>
+      <p className="contact-desc">We'd love to hear about your event</p>
 
-      <div className="contact-card">
-        <form className="contact-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <input
-              type="text"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              required
-            />
-            <label>
-              First Name <span className="required">(Required)</span>
-            </label>
-          </div>
-
-          <div className="form-group">
-            <input
-              type="text"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              required
-            />
-            <label>
-              Last Name <span className="required">(Required)</span>
-            </label>
-          </div>
-
-          <div className="form-group">
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-            <label>
-              Email <span className="required">(Required)</span>
-            </label>
-          </div>
-
-          <div className="form-group">
-            <input
-              type="number"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              required
-            />
-            <label>
-              Phone Number <span className="required">(Required)</span>
-            </label>
-          </div>
-
-          <div className="form-group">
-            <input
-              type="text"
-              name="country"
-              value={formData.country}
-              onChange={handleChange}
-              required
-            />
-            <label>
-              Country <span className="required">(Required)</span>
-            </label>
-          </div>
-
-          <div className="form-group">
-            <p className="event-title event">
-              Event Details
-              <span className="required">(Required)</span>
-            </p>
-          </div>
-
-          <div className="form-group">
-            <input
-              type="text"
-              name="venueAddress"
-              value={formData.eventDetail.venueAddress}
-              onChange={handleChange}
-              required
-            />
-            <label>
-              Location <span className="required">(Required)</span>
-            </label>
-          </div>
-
-          <div className="form-group">
-            <input
-              type="number"
-              name="numberOfGuests"
-              value={formData.eventDetail.numberOfGuests}
-              onChange={handleChange}
-              required
-            />
-            <label>
-              Number of Guests <span className="required">(Required)</span>
-            </label>
-          </div>
-
-          <div className="form-group event-options">
-            <p className="event-title time">
-              Date <span className="required">(Required)</span>
-            </p>
-            <input
-              type="date"
-              name="date"
-              value={formData.eventDetail.date}
-              onChange={handleChange}
-              required
-              min={new Date().toISOString().split("T")[0]}
-            />
-          </div>
-
-          <div className="form-group">
-            <input
-              type="text"
-              name="venueAddress"
-              value={formData.eventDetail.venueAddress}
-              onChange={handleChange}
-              required
-            />
-            <label>
-              Videography Photography or Both?{" "}
-              <span className="required">(Required)</span>
-            </label>
-          </div>
-
-          <div className="form-group">
-            <textarea
-              type="text"
-              name="additionalRequirements"
-              value={formData.eventDetail.additionalRequirements}
-              onChange={handleChange}
-              required
-              style={{ height: "100px" }}
-            />
-            <label>
-              Message
-              <span className="required">(Required)</span>
-            </label>
-          </div>
-
-          <div
-            className="form-group select-option weddingtype"
-            ref={weddingRef}
-          >
-            <p>
-              Wedding Type
-              <span className="required">(Required)</span>
-            </p>
-            <div className="select-options">
-              <span
-                className={`select-dropdown-title ${
-                  !isValid ? "error-border" : ""
-                }`}
-                onClick={() => setWedingType(!weddingType)}
-              >
-                {weddingOption || "Select an option"}
-                <IoIosArrowDown className="select-options-icon" />
-              </span>
-              {weddingType && (
-                <div className="select-dropdown">
-                  {weddingtype.map((item, index) => (
-                    <span
-                      key={index}
-                      onClick={() => handleWeddngSelection(item)}
-                    >
-                      {item}
-                    </span>
-                  ))}
+      <div className="contact-card-form">
+        <div className="premium-contact-card">
+          <form className="premium-contact-form" onSubmit={handleSubmit}>
+            <div className="form-grid">
+              {/* Name Fields */}
+              <div className="form-group floating-label">
+                <input
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  required
+                  className="form-input"
+                />
+                <label className="form-label">First Name</label>
+                <span className="required-asterisk">*</span>
+              </div>
+              <div className="form-group floating-label">
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  required
+                  className="form-input"
+                />
+                <label className="form-label">Last Name</label>
+                <span className="required-asterisk">*</span>
+              </div>
+              {/* Contact Fields */}
+              <div className="form-group floating-label">
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="form-input"
+                />
+                <label className="form-label">Email</label>
+                <span className="required-asterisk">*</span>
+              </div>
+              <div className="form-group floating-label">
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  required
+                  className="form-input"
+                />
+                <label className="form-label">Phone Number</label>
+                <span className="required-asterisk">*</span>
+              </div>
+              {/* Event Section */}
+              <div className="section-header">
+                <h3>Event Details</h3>
+                <div className="divider"></div>
+              </div>
+              <div className="form-group floating-label">
+                <input
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  required
+                  className="form-input"
+                />
+                <label className="form-label">Location</label>
+                <span className="required-asterisk">*</span>
+              </div>
+              <div className="form-group floating-label">
+                <input
+                  type="date"
+                  name="eventDate"
+                  value={formData.eventDate}
+                  onChange={handleChange}
+                  required
+                  min={new Date().toISOString().split("T")[0]}
+                  className="form-input"
+                />
+                <label className="form-label">Event Date</label>
+                <span className="required-asterisk">*</span>
+              </div>
+              {/* Services Checkbox */}
+              <div className="form-group services-group">
+                <label className="services-label">Services Needed</label>
+                <div className="checkbox-container">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="servicesNeeded"
+                      value="videographer"
+                      onChange={handleCheckboxChange}
+                      className="checkbox-input"
+                      checked={formData.servicesNeeded.includes("videographer")}
+                    />
+                    <span className="custom-checkbox"></span>
+                    Videographer
+                  </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="servicesNeeded"
+                      value="photographer"
+                      onChange={handleCheckboxChange}
+                      className="checkbox-input"
+                      checked={formData.servicesNeeded.includes("photographer")}
+                    />
+                    <span className="custom-checkbox"></span>
+                    Photographer
+                  </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="servicesNeeded"
+                      value="both"
+                      onChange={handleCheckboxChange}
+                      className="checkbox-input"
+                      checked={formData.servicesNeeded.includes("both")}
+                    />
+                    <span className="custom-checkbox"></span>
+                    Both
+                  </label>
                 </div>
-              )}
-            </div>
-            {!isValid && <p className="error-text">This field is required</p>}
-          </div>
-
-          <div className="form-group select-option" ref={selectRef}>
-            <p>
-              How Did You Hear About Us?
-              <span className="required">(Required)</span>
-            </p>
-            <div className="select-options">
-              <span
-                className={`select-dropdown-title ${
-                  !isValid ? "error-border" : ""
-                }`}
-                onClick={handleOpenSelect}
-              >
-                {selectedOption || "Select an option"}{" "}
-                <IoIosArrowDown className="select-options-icon" />
-              </span>
-              {openSelect && (
-                <div className="select-dropdown">
-                  {selectOptions.map((item, index) => (
-                    <span
-                      key={index}
-                      onClick={() => handleSelectOption(item.option)}
-                    >
-                      {item.option}
+              </div>
+              {/* Wedding Type Dropdown */}
+              <div className="form-group custom-select" ref={weddingRef}>
+                <label className="select-label">
+                  Wedding Type
+                  <span className="required-asterisk">*</span>
+                </label>
+                <div className="select-wrapper">
+                  <div
+                    className={`select-header ${!isValid ? "error" : ""}`}
+                    onClick={() => setWedingType(!weddingType)}
+                  >
+                    <span className="select-value">
+                      {weddingOption || "Select wedding type"}
                     </span>
-                  ))}
+                    <IoIosArrowDown
+                      className={`select-icon ${weddingType ? "open" : ""}`}
+                    />
+                  </div>
+                  {weddingType && (
+                    <div className="select-options">
+                      {weddingtype.map((item, index) => (
+                        <div
+                          key={index}
+                          className="select-option"
+                          onClick={() => handleWeddingSelection(item)}
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
+                {!isValid && (
+                  <div className="error-message">
+                    Please select a wedding type
+                  </div>
+                )}
+              </div>
+              {/* Referral Dropdown */}
+              <div className="form-group custom-select" ref={selectRef}>
+                <label className="select-label">
+                  How did you hear about us?
+                  <span className="required-asterisk">*</span>
+                </label>
+                <div className="select-wrapper">
+                  <div
+                    className={`select-header ${!isValid ? "error" : ""}`}
+                    onClick={handleOpenSelect}
+                  >
+                    <span className="select-value">
+                      {selectedOption || "Select an option"}
+                    </span>
+                    <IoIosArrowDown
+                      className={`select-icon ${openSelect ? "open" : ""}`}
+                    />
+                  </div>
+                  {openSelect && (
+                    <div className="select-options">
+                      {selectOptions.map((item, index) => (
+                        <div
+                          key={index}
+                          className="select-option"
+                          onClick={() => handleSelectOption(item.option)}
+                        >
+                          {item.option}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {!isValid && (
+                  <div className="error-message">Please select an option</div>
+                )}
+              </div>
+              {/* Message Field */}
+              <div className="form-group floating-label full-width">
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  className="form-input textarea"
+                  rows="4"
+                />
+                <label className="form-label">Your Message</label>
+                <span className="required-asterisk">*</span>
+              </div>
             </div>
-            {!isValid && <p className="error-text">This field is required</p>}
-          </div>
 
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
+            {/* Submit Button */}
+            <button type="submit" className="submit-button" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="spinner"></span>
+                  Sending...
+                </>
+              ) : (
+                "Send Message"
+              )}
+            </button>
 
-          <button type="submit" className="submit-button" disabled={loading}>
-            {loading ? "Sending..." : "Send"}
-          </button>
-        </form>
+            {errorMessage && <div className="form-error">{errorMessage}</div>}
+          </form>
+        </div>
       </div>
 
       <div className="contact2-section">

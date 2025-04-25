@@ -200,17 +200,24 @@ const About = () => {
 
               <hr className="about-content-left-bottom-line" />
             </div>
-          </div>
-        </div>
 
-        <div className="about-content-right">
-          <img
-            src={bg19}
-            alt="about image"
-            data-aos="fade-up"
-            data-aos-offset="700"
-            loading="lazy"
-          />
+            <div className="about-content-left-content">
+              <div className="about-content-left-content-top">
+                <h1>
+                  <CountUp
+                    start={startCount ? 0 : null}
+                    end={100}
+                    duration={2.5}
+                  />
+                  +
+                </h1>
+
+                <p>Cities Covered Globally</p>
+              </div>
+
+              <hr className="about-content-left-bottom-line" />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -258,25 +265,6 @@ const About = () => {
             <h2>Years Experience</h2>
           </div>
         </div>
-      </div>
-
-      <div className="about-content3">
-        <div className="scrolling-container">
-          <div className="scrolling-content">
-            <h1>TK</h1>
-            <h1>Production </h1>
-            <h1>Film</h1>
-          </div>
-          <div className="scrolling-content">
-            <h1>TK</h1>
-            <h1>Production </h1>
-            <h1>Film</h1>
-          </div>
-        </div>
-      </div>
-
-      <div className="about-content4">
-        <Video videoUrl="https://www.youtube.com/watch?v=TkX1fn7XBO8" />
       </div>
 
       <div className="core-option">

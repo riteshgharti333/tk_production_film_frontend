@@ -11,39 +11,42 @@ import axios from "axios";
 import { baseUrl } from "../../main";
 import Loader from "../../components/Loader/Loader";
 
+const fetchTeams = async () => {
+  if (!navigator.onLine) {
+    throw new Error("NETWORK_ERROR");
+  }
+
+  const { data } = await axios.get(`${baseUrl}/team/all-teams`);
+  return data?.teams;
+};
+
 const OurCore = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // ✅ Fetch team data with proper error handling
-  const fetchTeam = async () => {
-    try {
-      const { data } = await axios.get(`${baseUrl}/team/all-teams`);
-      return data.teams;
-    } catch (error) {
-      if (error.response) {
-        console.error("Server Error:", error.response);
-        throw new Error(
-          error.response.status >= 500
-            ? "Server error! Please try again later."
-            : "Failed to load team data!"
-        );
-      } else if (error.request) {
-        console.error("Network Error:", error.request);
-        throw new Error("Network error! Check your internet connection.");
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["teams"],
+    queryFn: fetchTeams,
+    staleTime: 1000 * 60 * 5,
+    retry: false,
+  });
+
+  if (isError) {
+    console.log("🔴 Error Object:", error);
+    if (error.name === "AxiosError") {
+      const isNetworkError =
+        !error.response ||
+        error.message.includes("ECONNRESET") ||
+        error.response?.data?.message === "read ECONNRESET";
+
+      if (isNetworkError) {
+        setTimeout(() => {
+          toast.error("🚫 Network error. Please check your connection.");
+        }, 100);
       } else {
-        console.error("Unknown Error:", error.message);
-        throw new Error("Unexpected error occurred!");
+        console.error("❗ Server Error:", error.response?.status);
       }
     }
-  };
-
-  // ✅ Use React Query for better data management
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["ourTeam"],
-    queryFn: fetchTeam,
-    staleTime: 1000 * 60 * 5,
-    retry: 2,
-  });
+  }
 
   return (
     <div className="ourCore">
@@ -90,7 +93,7 @@ const OurCore = () => {
           }}
         >
           {data?.length > 0 ? (
-            data.map((member, index) => (
+            data?.map((member, index) => (
               <SwiperSlide key={index} className="ourCore-slider-card">
                 <img
                   src={member.image}

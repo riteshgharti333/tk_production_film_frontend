@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Video.scss";
 import { TbPlayerPlayFilled } from "react-icons/tb";
 
@@ -9,21 +9,57 @@ const getYouTubeID = (url) => {
   return match ? match[1] : null;
 };
 
-const Video = ({ videoUrl ,videoSize }) => {
+const fallbackLevels = ["maxresdefault", "hqdefault", "mqdefault", "default"];
+
+const Video = ({ videoUrl, videoSize }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [thumbnailUrl, setThumbnailUrl] = useState(null);
 
   const videoId = getYouTubeID(videoUrl);
   if (!videoId) return <p>Invalid YouTube URL</p>;
 
-  // ✅ Use YouTube's thumbnail URL format
-  const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  useEffect(() => {
+    let currentIndex = 0;
+
+    const tryLoadThumbnail = () => {
+      if (currentIndex >= fallbackLevels.length) return;
+
+      const testUrl = `https://img.youtube.com/vi/${videoId}/${fallbackLevels[currentIndex]}.jpg`;
+
+      const img = new Image();
+      img.src = testUrl;
+      img.onload = () => {
+        // YouTube placeholders are usually 120x90
+        if (img.width > 120 && img.height > 90) {
+          setThumbnailUrl(testUrl);
+        } else {
+          currentIndex++;
+          tryLoadThumbnail();
+        }
+      };
+      img.onerror = () => {
+        currentIndex++;
+        tryLoadThumbnail();
+      };
+    };
+
+    tryLoadThumbnail();
+  }, [videoId]);
 
   return (
     <div className="video-container">
       {!isPlaying ? (
         <div className="thumbnail" onClick={() => setIsPlaying(true)}>
-          <img src={thumbnailUrl} alt="YouTube Thumbnail" loading="lazy" />
-          <div className={`player ${videoSize}` }>
+          {thumbnailUrl ? (
+            <img
+              src={thumbnailUrl}
+              alt="YouTube Thumbnail"
+              loading="lazy"
+            />
+          ) : (
+            <p>Loading thumbnail...</p>
+          )}
+          <div className={`player ${videoSize}`}>
             <TbPlayerPlayFilled className="player-icon" />
           </div>
         </div>

@@ -1,4 +1,4 @@
-import "./Service2.scss";
+import "../Service2.scss";
 
 import ServiceContact from "../../../components/ServiceContact/ServiceContact";
 import { service1Steps } from "../../../assets/servicesData";
@@ -18,49 +18,46 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import SEO from "../../../SEO/SEO";
 import { useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+
+const fetchService = async () => {
+  if (!navigator.onLine) {
+    throw new Error("NETWORK_ERROR");
+  }
+
+  const { data } = await axios.get(
+    `${baseUrl}/wedding-cinematography/all-videos`
+  );
+  return data?.videos;
+};
 
 const Service2 = () => {
   const contentRef = useRef(null);
 
-  const [serviceImages, setServiceImages] = useState();
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["service-2"],
+    queryFn: fetchService,
+    staleTime: 1000 * 60 * 5,
+    retry: false,
+  });
 
-  useEffect(() => {
-    const getServiceData = async () => {
-      try {
-        const { data } = await axios.get(
-          `${baseUrl}/services/wedding-cinematography/67de70bbaa6520fad7a06669`
-        );
+  if (isError) {
+    console.log("🔴 Error Object:", error);
+    if (error.name === "AxiosError") {
+      const isNetworkError =
+        !error.response ||
+        error.message.includes("ECONNRESET") ||
+        error.response?.data?.message === "read ECONNRESET";
 
-        if (data && data.serviceImages?.images) {
-          setServiceImages(data.serviceImages.images);
-        }
-      } catch (error) {
-        console.error("Error fetching service data:", error);
-        toast.error("Failed to fetch service data. Please try again.");
+      if (isNetworkError) {
+        setTimeout(() => {
+          toast.error("🚫 Network error. Please check your connection.");
+        }, 100);
+      } else {
+        console.error("❗ Server Error:", error.response?.status);
       }
-    };
-
-    getServiceData();
-  }, []);
-
-  const [allData, setAllData] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data } = await axios.get(
-          `${baseUrl}/wedding-cinematography/all-videos`
-        );
-        if (data && data.videos) {
-          setAllData(data.videos);
-        }
-      } catch (error) {
-        console.error("Error fetching videos:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+    }
+  }
 
   const location = useLocation();
   const baseUrl =
@@ -87,7 +84,7 @@ const Service2 = () => {
       <div className="service2-container">
         <div className="service2-container-content" ref={contentRef}>
           <div className="service2-container-content-top">
-            <div className="services-img-slide">
+            {/* <div className="services-img-slide">
               <Swiper
                 modules={[EffectFade, Autoplay]}
                 effect="fade"
@@ -96,13 +93,42 @@ const Service2 = () => {
                 autoplay={{ delay: 3000, disableOnInteraction: false }}
                 className="services-slide"
               >
-                {serviceImages?.map((item, index) => (
+                {data?.map((item, index) => (
                   <SwiperSlide key={index} className="service_slide">
-                    <img src={item} loading="lazy" alt="services" />
+                      <Video videoUrl={item.link} videoSize="wedding" />
                   </SwiperSlide>
                 ))}
               </Swiper>
+            </div> */}
+
+            <div className="service-films">
+              <h2>Wedding Cinematography Videos</h2>
+              <hr />
+              <div className="service-videos">
+                {data?.length > 0 &&
+                  data?.map((item, index) => (
+                    <div className="service-video" key={index}>
+                      <Video videoUrl={item.link} videoSize="wedding" />
+                    </div>
+                  ))}
+              </div>
+              <div className="subscribe-btn">
+                <p>
+                  Subscribe to our YouTube channel for more stunning wedding
+                  films and exclusive content!
+                </p>
+
+                <a
+                  href="https://www.youtube.com/@tkproductionfilm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="sub-btn"
+                >
+                  Subscribe
+                </a>
+              </div>
             </div>
+
             <h1>Wedding Cinematography by TK Production Film</h1>
             <p>
               Capture your love story with TK Production Film. Led by Taufeq
@@ -123,51 +149,28 @@ const Service2 = () => {
             </p>
           </div>
 
-          <div className="service2-steps">
-            <h1>How It Works?</h1>
+          <div className="service2-steps-container">
+            <div className="service2-steps">
+              <h1>How It Works?</h1>
 
-            <ul>
-              {service1Steps.map((item) => (
-                <li key={item.no}>
-                  <p>{item.no}</p>
-                  <p>
-                    <span>{item.title}</span> {item.desc}
-                  </p>
-                </li>
-              ))}
-            </ul>
-
-            <p>Let us make your special day unforgettable!</p>
+              <ul>
+                {service1Steps.map((item) => (
+                  <li key={item.no}>
+                    <p>{item.no}</p>
+                    <p>
+                      <span>{item.title}</span> {item.desc}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
+
+          <p className="bottom-desc">
+            Let us make your special day unforgettable!
+          </p>
 
           <hr />
-
-          <div className="service-films">
-            <h2>Wedding Cinematography Videos</h2>
-            <div className="service-videos">
-              {allData?.length > 0 &&
-                allData?.map((item, index) => (
-                  <div className="service-video" key={index}>
-                    <Video videoUrl={item.link} videoSize="wedding" />
-                  </div>
-                ))}
-            </div>
-            <div className="subscribe-btn">
-              <p>
-                Subscribe to our YouTube channel for more stunning wedding films
-                and exclusive content!
-              </p>
-
-              <a
-                href="https://www.youtube.com/@tkproductionfilm"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="sub-btn"
-              >
-                Subscribe
-              </a>
-            </div>
-          </div>
         </div>
       </div>
       <div className="service-contact">
