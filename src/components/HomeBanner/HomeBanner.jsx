@@ -105,8 +105,8 @@ const HomeBanner = () => {
         }}
         className="swiper-container"
       >
-        {bigBanner?.length > 0 ? (
-          bigBanner.map((slide, index) => (
+        {data?.length > 0 ? (
+          data.map((slide, index) => (
             <SwiperSlide key={index} className="slide">
               <div className="homeBanner-imgs">
                 <img src={slide.image} alt="Banner" loading="lazy" />
@@ -116,10 +116,7 @@ const HomeBanner = () => {
                   className={`homeBanner-desc ${
                     initialized && index === activeIndex ? "animate" : ""
                   }`}
-                >
-                  <h1>{slide.title}</h1>
-                  <p>{slide.desc}</p>
-                </div>
+                ></div>
               </Link>
             </SwiperSlide>
           ))
