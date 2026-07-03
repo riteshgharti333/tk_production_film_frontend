@@ -2,12 +2,11 @@ import "./Gallery.scss";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { baseUrl } from "../../main";
-import SEO from "../../SEO/SEO";
 import { useLocation } from "react-router-dom";
+import { usePortfolios } from "../../services/hooks";
 import Loader from "../../components/Loader/Loader";
+import ErrorFallback from "../../components/Error/ErrorFallback";
+import SEO from "../../SEO/SEO";
 
 const Gallery = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -17,36 +16,13 @@ const Gallery = () => {
 
   const offset = currentPage * cardsPerPage;
 
-  // ✅ Fetch Portfolio with Error Handling
-  const fetchPortfolios = async () => {
-    try {
-      const { data } = await axios.get(`${baseUrl}/portfolio/all-portfolios`);
-      return data.portfolios;
-    } catch (error) {
-      if (error.response) {
-        console.error("Server Error:", error.response);
-        throw new Error(
-          error.response.status >= 500
-            ? "Server error! Please try again later."
-            : "Failed to load portfolios!"
-        );
-      } else if (error.request) {
-        console.error("Network Error:", error.request);
-        throw new Error("Network error! Check your internet connection.");
-      } else {
-        console.error("Unknown Error:", error.message);
-        throw new Error("Unexpected error occurred!");
-      }
-    }
-  };
-
-  // ✅ Use React Query for data fetching
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["portfolios"],
-    queryFn: fetchPortfolios,
-    staleTime: 1000 * 60 * 5,
-    retry: 2,
-  });
+  const { 
+    data, 
+    isLoading, 
+    isError, 
+    error, 
+    refetch 
+  } = usePortfolios();
 
   const currentCards = data ? data.slice(offset, offset + cardsPerPage) : [];
 
@@ -55,8 +31,7 @@ const Gallery = () => {
     window.scrollTo(0, 0);
   };
 
-  const baseUrl =
-    import.meta.env.VITE_BASE_URL || "https://tkproductionfilm.com";
+  const baseUrl = import.meta.env.VITE_BASE_URL || "https://tkproductionfilm.com";
   const fullUrl = `${baseUrl}${location.pathname}`;
 
   return (
@@ -71,35 +46,37 @@ const Gallery = () => {
       <div className="gallery-top-banner">
         <div className="gallery-banner">
           <div className="gallery-banner-desc">
-            <h1>Portfolio</h1>
+            <h1>PORTFOLIO</h1>
           </div>
         </div>
       </div>
 
       <div className="gallery-container">
         <div className="gallery-container-top">
-          <h1> Our Portfolio</h1>
+          <h1>Our Portfolio</h1>
           <p>TK Production Films - All of your beautiful memories</p>
         </div>
 
-        {/* ✅ Show Loader inside Main Section */}
         {isLoading ? (
           <div className="gallery-loader-container">
             <Loader loaderSize="galleryLoader" />
           </div>
         ) : isError ? (
-          <div className="error-container">
-            <p>{error.message}</p>
-            <button onClick={() => refetch()}>Retry</button>
+          <div className="gallery-error-container">
+            <ErrorFallback
+              message={error?.message || "Failed to load portfolios. Please try again."}
+              onRetry={refetch}
+              fullScreen={false}
+            />
           </div>
         ) : currentCards.length > 0 ? (
           <>
             <div className="gallery-cards">
               {currentCards.map((item, index) => (
-                <div key={index} className="gallery-card">
+                <div key={item._id || index} className="gallery-card">
                   <img
                     src={item.image}
-                    alt="portfolio image"
+                    alt={item.title || "portfolio image"}
                     onClick={() => setSelectedImg(item.image)}
                     loading="lazy"
                     decoding="async"
@@ -136,7 +113,13 @@ const Gallery = () => {
             />
           </>
         ) : (
-          <p>No portfolios available</p>
+          <div className="gallery-empty-container">
+            <ErrorFallback
+              message="No portfolios available at the moment."
+              onRetry={refetch}
+              fullScreen={false}
+            />
+          </div>
         )}
       </div>
 

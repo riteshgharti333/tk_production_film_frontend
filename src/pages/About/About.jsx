@@ -84,7 +84,7 @@ const About = () => {
       <div className="top-banner">
         <div className="about-banner">
           <div className="about-banner-desc">
-            <h1>About</h1>
+            <h1>ABOUT US</h1>
           </div>
         </div>
       </div>
@@ -127,10 +127,6 @@ const About = () => {
           and your loved ones will cherish forever. Let us bring your love story
           to life!
         </p>
-      </div>
-
-      <div className="about-big-img" data-aos="fade-up">
-        <img src={bg17} alt="About Us" loading="lazy" />
       </div>
 
       <div className="about-overlay">

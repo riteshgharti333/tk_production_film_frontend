@@ -9,17 +9,27 @@
     }
 
     .gallery-banner {
-      background-image: url("../../assets/images/bg15.jpg");
+      background-image: url("../../assets/images/bannerimg/banner6.webp");
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
       height: 500px;
       position: relative;
 
-      @include md {
-        height: 300px;
+       &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.7) 0%,
+          rgba(0, 0, 0, 0.4) 50%,
+          rgba(0, 0, 0, 0.7) 100%
+        );
+        z-index: 1;
       }
 
+      
       .gallery-banner-desc {
         position: absolute;
         top: 50%;

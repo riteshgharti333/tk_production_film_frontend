@@ -8,59 +8,48 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 
 import { BsArrowUpRight } from "react-icons/bs";
-
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
-import { baseUrl } from "../../main";
-import Loader from "../../components/Loader/Loader";
-import { toast } from "react-hot-toast";
-import { bigBanner } from "../../assets/data";
 import { Link } from "react-router-dom";
+
+// Import hooks and components
+import { useHomeBanners, useMobileBanners } from "../../services/hooks";
+import Loader from "../../components/Loader/Loader";
+import ErrorFallback from "../../components/Error/ErrorFallback";
+import { bigBanner } from "../../assets/data";
 
 const HomeBanner = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
-
   const [initialized, setInitialized] = useState(false);
-  // ✅ Function to fetch banners with better error handling
-  const fetchBanners = async () => {
-    try {
-      const apiUrl = isMobile
-        ? `${baseUrl}/mobile/all-mobile-banners`
-        : `${baseUrl}/home-banner/all-home-banners`;
+  const [activeIndex, setActiveIndex] = useState(0);
 
-      const { data } = await axios.get(apiUrl);
-      return data.homeBanner;
-    } catch (error) {
-      // ✅ Handle specific error types
-      if (error.response) {
-        // Server responded with a status outside 2xx
-        console.error("Server Error:", error.response);
-        throw new Error(
-          error.response.status >= 500
-            ? "Server error! Please try again later."
-            : "Failed to load banners!"
-        );
-      } else if (error.request) {
-        // No response from the server (Network issue)
-        console.error("Network Error:", error.request);
-        throw new Error("Network error! Check your internet connection.");
-      } else {
-        // Unknown error
-        console.error("Unknown Error:", error.message);
-        throw new Error("Unexpected error occurred!");
-      }
-    }
-  };
-
-  // ✅ Use React Query to fetch banners
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["homeBanners", isMobile],
-    queryFn: fetchBanners,
-    staleTime: 1000 * 60 * 5,
-    retry: 2,
+  // Use React Query hooks instead of direct API calls
+  const { 
+    data: homeBanners, 
+    isLoading: homeLoading, 
+    isError: homeError, 
+    error: homeErrorObj,
+    refetch: refetchHome 
+  } = useHomeBanners({
+    enabled: !isMobile,
   });
 
-  // ✅ Handle Resize for Mobile/Desktop Switch
+  const { 
+    data: mobileBanners, 
+    isLoading: mobileLoading, 
+    isError: mobileError, 
+    error: mobileErrorObj,
+    refetch: refetchMobile 
+  } = useMobileBanners({
+    enabled: isMobile,
+  });
+
+  // Determine which data and loading state to use
+  const isLoading = isMobile ? mobileLoading : homeLoading;
+  const isError = isMobile ? mobileError : homeError;
+  const error = isMobile ? mobileErrorObj : homeErrorObj;
+  const data = isMobile ? mobileBanners : homeBanners;
+  const refetch = isMobile ? refetchMobile : refetchHome;
+
+  // Handle Resize for Mobile/Desktop Switch
   useEffect(() => {
     const handleResize = () => {
       const isMobileNow = window.innerWidth <= 480;
@@ -74,19 +63,17 @@ const HomeBanner = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [isMobile, refetch]);
 
-  // ✅ Loading State
+  // Loading State
   if (isLoading) return <Loader />;
 
-  // ✅ Error State Handling
+  // Error State with ErrorFallback
   if (isError) {
-    toast.error(error.message || "Failed to load banners.");
     return (
-      <div className="error-container">
-        <div className="error-container-desc">
-          <p>{error.message}</p>
-          <button onClick={() => refetch()}>Retry</button>
-        </div>
-      </div>
+      <ErrorFallback
+        message={error?.message || "Failed to load banners. Please try again."}
+        onRetry={refetch}
+        fullScreen={false}
+      />
     );
   }
 
@@ -104,13 +91,15 @@ const HomeBanner = () => {
           prevEl: ".swiper-button-prev",
         }}
         className="swiper-container"
+        onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
+        onInit={() => setInitialized(true)}
       >
-        {data?.length > 0 ? (
-          data.map((slide, index) => (
-            <SwiperSlide key={index} className="slide">
-              <div className="homeBanner-imgs">
-                <img src={slide.image} alt="Banner" loading="lazy" />
-              </div>
+        {data.map((slide, index) => (
+          <SwiperSlide key={slide.id || index} className="slide">
+            <div className="homeBanner-imgs">
+              <img src={slide.image} alt={slide.title || "Banner"} loading="lazy" />
+            </div>
+            {slide.link && (
               <Link to={slide.link}>
                 <div
                   className={`homeBanner-desc ${
@@ -118,11 +107,9 @@ const HomeBanner = () => {
                   }`}
                 ></div>
               </Link>
-            </SwiperSlide>
-          ))
-        ) : (
-          <p>No banners available</p>
-        )}
+            )}
+          </SwiperSlide>
+        ))}
       </Swiper>
 
       <div className="swiper-button-prev">Prev</div>

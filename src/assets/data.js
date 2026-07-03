@@ -306,51 +306,47 @@ export const client_reviews = [
 export const services = [
   {
     service_name: "Wedding Photography",
-    link: "/wedding-photography",
+    link: "/services/wedding-photography",
     img: service2,
   },
   {
     service_name: "Wedding Cinematography",
-    link: "/wedding-cinematography",
+    link: "/services/wedding-cinematography",
     img: service7,
   },
-
   {
     service_name: "Pre-Wedding Film",
-    link: "/pre-wedding-film",
+    link: "/services/pre-wedding-film",
     img: service12,
   },
-
   {
     service_name: "Pre-Wedding Photography",
-    link: "/pre-wedding-photography",
+    link: "/services/pre-wedding-photography",
     img: service13,
   },
-
   {
     service_name: "Civil Marriage Photography",
-    link: "/civil-marriage-photography",
+    link: "/services/civil-marriage-photography",
     img: service6,
   },
   {
     service_name: "Engagement Photography & Couple Portraits",
-    link: "/engagement-photography-couple-portraits",
+    link: "/services/engagement-photography-couple-portraits",
     img: service10,
   },
-
   {
     service_name: "Birthday Photography",
-    link: "/birthday-photography",
+    link: "/services/birthday-photography",
     img: service9,
   },
   {
     service_name: "Baby Shower Photography",
-    link: "/baby-shower-photography",
+    link: "/services/baby-shower-photography",
     img: service8,
   },
   {
     service_name: "Graduation Photography",
-    link: "/graduation-photography",
+    link: "/services/graduation-photography",
     img: service11,
   },
 ];
@@ -579,8 +575,6 @@ export const gallery = [
 
 import chooseImg_1 from "../assets/images/chooseImages/whychooseusimage1.jpg";
 import chooseImg_2 from "../assets/images/chooseImages/whychooseusimage2.jpg";
-
-
 
 export const featuresData = [
   {

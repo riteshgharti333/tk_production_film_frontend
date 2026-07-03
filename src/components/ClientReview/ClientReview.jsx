@@ -13,19 +13,9 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 
 import reviewBgImg from "../../assets/images/reviewbgimg.jpeg";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { baseUrl } from "../../main";
+import { useReviews } from "../../services/hooks";
 import Loader from "../../components/Loader/Loader";
-
-const fetchReviews = async () => {
-  if (!navigator.onLine) {
-    throw new Error("NETWORK_ERROR");
-  }
-
-  const { data } = await axios.get(`${baseUrl}/review/all-reviews`);
-  return data?.reviews;
-};
+import ErrorFallback from "../../components/Error/ErrorFallback";
 
 const ClientReview = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -48,30 +38,13 @@ const ClientReview = () => {
     };
   }, [expandedReview]);
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["reviews"],
-    queryFn: fetchReviews,
-    staleTime: 1000 * 60 * 5,
-    retry: false,
-  });
-
-  if (isError) {
-    console.log("🔴 Error Object:", error);
-    if (error.name === "AxiosError") {
-      const isNetworkError =
-        !error.response ||
-        error.message.includes("ECONNRESET") ||
-        error.response?.data?.message === "read ECONNRESET";
-
-      if (isNetworkError) {
-        setTimeout(() => {
-          toast.error("🚫 Network error. Please check your connection.");
-        }, 100);
-      } else {
-        console.error("❗ Server Error:", error.response?.status);
-      }
-    }
-  }
+  const { 
+    data, 
+    isLoading, 
+    isError, 
+    error, 
+    refetch 
+  } = useReviews();
 
   return (
     <div className="clientReview">
@@ -98,13 +71,14 @@ const ClientReview = () => {
               </SwiperSlide>
             ) : isError ? (
               <SwiperSlide className="swiper-slide-error">
-                <div className="error-container">
-                  <p>{error.message}</p>
-                  <button onClick={() => refetch()}>Retry</button>
-                </div>
+                <ErrorFallback
+                  message={error?.message || "Failed to load reviews. Please try again."}
+                  onRetry={refetch}
+                  fullScreen={false}
+                />
               </SwiperSlide>
             ) : data?.length > 0 ? (
-              data?.map((review, index) => (
+              data.map((review, index) => (
                 <SwiperSlide key={review._id}>
                   <ReviewCard
                     review={review}
@@ -115,7 +89,11 @@ const ClientReview = () => {
               ))
             ) : (
               <SwiperSlide className="swiper-slide-empty">
-                <p>No reviews available</p>
+                <ErrorFallback
+                  message="No reviews available at the moment."
+                  onRetry={refetch}
+                  fullScreen={false}
+                />
               </SwiperSlide>
             )}
           </Swiper>
@@ -130,7 +108,7 @@ const ClientReview = () => {
         </div>
       </div>
 
-      {/* ✅ Overlay Modal for Full Review */}
+      {/* Overlay Modal for Full Review */}
       {expandedReview && (
         <div className="clientReview-overlay">
           <div className="clientReview-modal" ref={modalRef}>

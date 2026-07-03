@@ -6,25 +6,15 @@ import Footer from "./components/Footer/Footer";
 import Homepage from "./pages/Homepage/Homepage.jsx";
 import About from "./pages/About/About.jsx";
 
-import Service1 from "./pages/ServicesPage/Service1/Service1.jsx";
-import Service2 from "./pages/ServicesPage/Service2/Service2.jsx";
-import Service3 from "./pages/ServicesPage/Service3/Service3.jsx";
-import Service4 from "./pages/ServicesPage/Service4/Service4.jsx";
-import Service5 from "./pages/ServicesPage/Service5/Service5.jsx";
-import Service6 from "./pages/ServicesPage/Service6/Service6.jsx";
 import Contact from "./pages/Contact/Contact.jsx";
 import Gallery from "./pages/Gallery/Gallery.jsx";
-import Service7 from "./pages/ServicesPage/Service7/Service7.jsx";
 import { useEffect } from "react";
 
 import { Toaster } from "react-hot-toast";
-import Service8 from "./pages/ServicesPage/Service8/Service8.jsx";
-import Service9 from "./pages/ServicesPage/Service9/Service9.jsx";
 import { ScrollProvider, useScrollContext } from "./context/ScrollContext.jsx";
-
 import { HelmetProvider } from "react-helmet-async";
-import ReactQueryProvider from "../utils/ReactQueryProvider.jsx";
-import Wt from "./pages/WeddingTypePage/Wt.jsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ServicePage from "./pages/ServicesPage/ServicePage.jsx";
 
 function App() {
   const ScrollToTop = () => {
@@ -41,9 +31,11 @@ function App() {
     return null;
   };
 
+  const queryClient = new QueryClient();
+
   return (
     <div className="app">
-      <ReactQueryProvider>
+      <QueryClientProvider client={queryClient}>
         <HelmetProvider>
           <ScrollProvider>
             <BrowserRouter>
@@ -56,29 +48,8 @@ function App() {
                 <Route path="/portfolio" element={<Gallery />} />
 
                 {/* services */}
-                <Route path="/wedding-photography" element={<Service1 />} />
-                <Route path="/wedding-cinematography" element={<Service2 />} />
-                <Route path="/pre-wedding-film" element={<Service3 />} />
-                <Route path="/pre-wedding-photography" element={<Service4 />} />
-                <Route
-                  path="/civil-marriage-photography"
-                  element={<Service5 />}
-                />
-                <Route
-                  path="/engagement-photography-couple-portraits"
-                  element={<Service6 />}
-                />
+                <Route path="/services/:slug" element={<ServicePage />} />
 
-                <Route path="/birthday-photography" element={<Service7 />} />
-
-                <Route path="/baby-shower-photography" element={<Service8 />} />
-
-                <Route path="/graduation-photography" element={<Service9 />} />
-
-                {/* services */}
-
-                {/* type */}
-                <Route path="/hindu-wedding" element={<Wt />} />
               </Routes>
               <Footer />
 
@@ -95,7 +66,7 @@ function App() {
             </BrowserRouter>
           </ScrollProvider>
         </HelmetProvider>
-      </ReactQueryProvider>
+      </QueryClientProvider>
     </div>
   );
 }

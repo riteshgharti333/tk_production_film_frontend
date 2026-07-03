@@ -6,46 +6,33 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { baseUrl } from "../../main";
+import { usePhotoAlbums } from "../../services/hooks";
 import Loader from "../../components/Loader/Loader";
-
-const fetchBanner = async () => {
-  if (!navigator.onLine) {
-    throw new Error("NETWORK_ERROR");
-  }
-
-  const { data } = await axios.get(`${baseUrl}/photoAlbum/all-photo-album`);
-  return data?.photoAlbum;
-};
+import ErrorFallback from "../../components/Error/ErrorFallback";
 
 const PhotoAlbums = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["photo-album"],
-    queryFn: fetchBanner,
-    staleTime: 1000 * 60 * 5,
-    retry: false,
-  });
+  const { 
+    data, 
+    isLoading, 
+    isError, 
+    error, 
+    refetch 
+  } = usePhotoAlbums();
+
+  if (isLoading) {
+    return <Loader loaderSize="photoAlbumLoader" />;
+  }
 
   if (isError) {
-    console.log("🔴 Error Object:", error);
-    if (error.name === "AxiosError") {
-      const isNetworkError =
-        !error.response ||
-        error.message.includes("ECONNRESET") ||
-        error.response?.data?.message === "read ECONNRESET";
-
-      if (isNetworkError) {
-        setTimeout(() => {
-          toast.error("🚫 Network error. Please check your connection.");
-        }, 100);
-      } else {
-        console.error("❗ Server Error:", error.response?.status);
-      }
-    }
+    return (
+      <ErrorFallback
+        message={error?.message || "Failed to load photo albums. Please try again."}
+        onRetry={refetch}
+        fullScreen={false}
+      />
+    );
   }
 
   return (
@@ -54,48 +41,40 @@ const PhotoAlbums = () => {
       <p className="photoAlbums-desc">
         Collection of photos - All of Our Best Works
       </p>
-      {isLoading ? (
-        <Loader loaderSize="photoAlbumLoader" />
-      ) : isError ? (
-        <div className="error-container">
-          <div className="error-container-desc">
-            <p>{error.message}</p>
-            <button onClick={() => refetch()}>Retry</button>
-          </div>
-        </div>
-      ) : (
-        <div className="photoAlbums-cards">
-          <Swiper
-            slidesPerView={2}
-            centeredSlides={false}
-            spaceBetween={20}
-            loop={true}
-            speed={2500}
-            autoplay={{ delay: 3000, disableOnInteraction: false }}
-            modules={[Autoplay, Navigation]}
-            className="photoAlbums-slider album-swiper"
-            navigation={{
-              nextEl: ".pa-swiper-next",
-              prevEl: ".pa-swiper-prev",
-            }}
-            onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-            breakpoints={{
-              0: {
-                slidesPerView: 1,
-                spaceBetween: 10,
-              },
-              768: {
-                slidesPerView: 2,
-                spaceBetween: 15,
-              },
-              1024: {
-                slidesPerView: 2,
-                spaceBetween: 20,
-              },
-            }}
-          >
-            {data?.length > 0 ? (
-              data.map((album, index) => (
+      
+      <div className="photoAlbums-cards">
+        {data?.length > 0 ? (
+          <>
+            <Swiper
+              slidesPerView={2}
+              centeredSlides={false}
+              spaceBetween={20}
+              loop={true}
+              speed={2500}
+              autoplay={{ delay: 3000, disableOnInteraction: false }}
+              modules={[Autoplay, Navigation]}
+              className="photoAlbums-slider album-swiper"
+              navigation={{
+                nextEl: ".pa-swiper-next",
+                prevEl: ".pa-swiper-prev",
+              }}
+              onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
+              breakpoints={{
+                0: {
+                  slidesPerView: 1,
+                  spaceBetween: 10,
+                },
+                768: {
+                  slidesPerView: 2,
+                  spaceBetween: 15,
+                },
+                1024: {
+                  slidesPerView: 2,
+                  spaceBetween: 20,
+                },
+              }}
+            >
+              {data.map((album, index) => (
                 <SwiperSlide key={album._id} className="photoAlbums-card">
                   <div className="photoAlbums-card-content">
                     <img
@@ -110,18 +89,20 @@ const PhotoAlbums = () => {
                     />
                   </div>
                 </SwiperSlide>
+              ))}
+            </Swiper>
 
-                
-              ))
-            ) : (
-              <p>No photo albums available</p>
-            )}
-          </Swiper>
-
-          <div className="pa-swiper-prev">❮</div>
-        <div className="pa-swiper-next">❯</div>
-        </div>
-      )}
+            <div className="pa-swiper-prev">❮</div>
+            <div className="pa-swiper-next">❯</div>
+          </>
+        ) : (
+          <ErrorFallback
+            message="No photo albums available at the moment."
+            onRetry={refetch}
+            fullScreen={false}
+          />
+        )}
+      </div>
     </div>
   );
 };
